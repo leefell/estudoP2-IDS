@@ -34,6 +34,4 @@ services:
     depends_on:
       - banco
     networks:
-      - mynetnetworks:
-  mynet:
-    driver: bridge
+      - mynet
