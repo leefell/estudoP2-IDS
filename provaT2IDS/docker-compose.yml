@@ -1,0 +1,41 @@
+networks:
+  src:
+
+services:
+  app:
+    build:
+      context: ./crud
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./crud/src:/var/www/html
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    networks:
+      - src
+
+  db:
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: avaliacao
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./crud/sql.sql:/docker-entrypoint-initdb.d/sql.sql
+    networks:
+      - src
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    networks:
+      - src
