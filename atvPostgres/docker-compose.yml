@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./web:/var/www/html
+    restart: always
+    networks:
+      - startup
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: startup_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    restart: always
+    networks:
+      - startup
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    restart: always
+    networks:
+      - startup
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  startup:
+    driver: bridge
