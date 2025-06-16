@@ -1,0 +1,37 @@
+networks:
+  mynet:
+    driver: bridge
+    
+services:
+  web:
+    build: ./web/
+    ports:
+      - "80:80"
+    depends_on:
+      - banco
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - mynet
+
+  banco:
+    build: ./sql/
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_da_nasa
+      MYSQL_DATABASE: lamp
+      MYSQL_USER: user_lamp
+      MYSQL_PASSWORD: lamp_pass
+    networks:
+      - mynet
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - banco
+    networks:
+      - mynet
