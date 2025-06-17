@@ -1,0 +1,44 @@
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - provaIDS
+    environment:
+      DB_HOST: db
+      DB_NAME: aval_acao
+      DB_USER: user
+      DB_PASS: pass
+    restart: always
+
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: aval_acao
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - provaIDS
+    restart: always
+
+networks:
+  provaIDS:
+    driver: bridge
+
+FROM php:8.2-apache
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+RUN chown -R www-data:www-data /var/www/html/
+RUN chmod -R 755 /var/www/html/
